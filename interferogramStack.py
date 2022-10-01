@@ -295,7 +295,7 @@ def check_ifgs_status(work_dir):
     '''
     ifg_dir = os.path.join(work_dir, 'merged/interferograms')
     update_status = os.path.isdir(ifg_dir)
-
+    print(update_status)
     if update_status:
         #Find the existing interferogram pairs
         ifg_list = glob.glob(os.path.join(ifg_dir, '*/filt_fine.unw'))
@@ -400,8 +400,19 @@ def select_pairs(date_list, bperp_list, network='sequential',
     elif network == 'delaunay':
         from scipy.spatial import Delaunay
 
-        points = np.vstack([decimal_dates, slc_list.bperp]).T
-        tri = Delaunay(points)
+        points = np.vstack([decimal_dates, 
+                            slc_list.bperp]).T
+
+        ddates = ((decimal_dates - decimal_dates[0]) * 365.25)
+
+        points1 = np.vstack([ddates / np.max(ddates), 
+                             slc_list.bperp/ np.max(np.abs(slc_list.bperp))]).T
+        '''
+        points1 = np.vstack([ddates, 
+                     slc_list.bperp]).T
+                             '''
+        #normalize decimal_dates and bperp
+        tri = Delaunay(points1, qhull_options='Qt')
         simplices = points[tri.simplices, 0]
         pairs = np.vstack((
                     simplices[:, (0,1)],
