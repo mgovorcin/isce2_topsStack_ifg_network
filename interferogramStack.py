@@ -593,6 +593,23 @@ def select_pairs(date_list, bperp_list, network='sequential',
 
     return acquisitionDates, stackReferenceDate, pairs, existing_pairs
 
+# Modified run class in Stack.py to change config/run_files dir
+def configure(self,inps, runName):
+    for k in inps.__dict__.keys():
+        setattr(self, k, inps.__dict__[k])
+    self.runDir = os.path.join(self.work_dir, 'run_ifg_files')
+    os.makedirs(self.runDir, exist_ok=True)
+
+    self.run_outname = os.path.join(self.runDir, runName)
+    print ('writing ', self.run_outname)
+
+    self.config_path = os.path.join(self.work_dir,'configs_ifgs')
+    os.makedirs(self.config_path, exist_ok=True)
+
+    self.runf = open(self.run_outname,'w')
+
+    return self
+
 
 ###############################################################################
 ################# interferogram stack - gen. of run_files #####################
@@ -614,25 +631,25 @@ def interferogramStack(inps, acquisitionDates, stackReferenceDate, secondaryDate
     '''
     i+=1
     runObj = run()
-    runObj.configure(inps, 'run_{:02d}_generate_burst_igram'.format(i))
+    runObj = configure(runObj, inps, 'run_{:02d}_generate_burst_igram'.format(i))
     runObj.generate_burstIgram(acquisitionDates, safe_dict, pairs)
     runObj.finalize()
 
     i += 1
     runObj = run()
-    runObj.configure(inps, 'run_{:02d}_merge_burst_igram'.format(i))
+    runObj = configure(runObj, inps, 'run_{:02d}_merge_burst_igram'.format(i))
     runObj.igram_mergeBurst(acquisitionDates, safe_dict, pairs)
     runObj.finalize()
 
     i+=1
     runObj = run()
-    runObj.configure(inps, 'run_{:02d}_filter_coherence'.format(i))
+    runObj = configure(runObj, inps, 'run_{:02d}_filter_coherence'.format(i))
     runObj.filter_coherence(pairs)
     runObj.finalize()
 
     i+=1
     runObj = run()
-    runObj.configure(inps, 'run_{:02d}_unwrap'.format(i))
+    runObj = configure(runObj, inps, 'run_{:02d}_unwrap'.format(i))
     runObj.unwrap(pairs)
     runObj.finalize()
 
