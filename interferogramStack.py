@@ -589,7 +589,7 @@ def select_pairs(date_list, bperp_list, network='sequential',
             ax.legend([extra], [f'Num of pairs: {len(pairs_ix)}'], facecolor='slategrey', framealpha=0.2)
 
         # Save network figure
-        fig.savefig('interferogram_network.pdf')
+        fig.savefig('interferogram_network.png')
 
     return acquisitionDates, stackReferenceDate, pairs, existing_pairs
 
